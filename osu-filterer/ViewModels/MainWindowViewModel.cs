@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
-using Avalonia;
 
 namespace osu_filterer.ViewModels;
 

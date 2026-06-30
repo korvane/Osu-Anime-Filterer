@@ -14,7 +14,7 @@ obj/
 project.nuget.cache
 
 # ===== VS Code =====
-.vscode/
+.vscode
 
 # ===== OS =====
 .DS_Store

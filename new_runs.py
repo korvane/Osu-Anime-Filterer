@@ -54,4 +54,4 @@ with open(BASE_DIR / "ML" / "anime_classifier.pkl", "rb") as f:
 image_paths = json.loads(sys.stdin.readline())
 image_paths = image_paths["images"]
 result = is_filtered(image_paths)
-print(json.dumps(result))
+json.dumps(result)

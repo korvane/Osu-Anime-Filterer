@@ -1,50 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Avalonia.Controls;
 using System.Diagnostics;
+using System.IO;
 using System.Text.Json;
+using Avalonia;
 
 namespace osu_filterer.ViewModels;
 
 public class ModelOutputItem
 {
-    public string Path { get; set; }
+    public required string Path { get; set; }
     public bool Prediction { get; set; }
     public double Probability { get; set; }
+    public string Name => System.IO.Path.GetFileName(Path);
 }
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private static readonly String projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
-    public string Greeting { get; } = "Welcome to Avalonia!";
+    private static readonly string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
 
-    public static async void FilterImages(String path)
+    public static async void HandleFilter(string path)
     {
         path = Path.Join(path, "Songs");
         if (!Path.Exists(path))
         {
             Console.Write("Choose a valid path.");
-            var dialog = new Window
-            {
-                Title = "Error",
-                Width = 300,
-                Height = 150,
-                Content = new TextBlock { Text = "Select a valid file path.", Margin = new Avalonia.Thickness(20) }
-            };
-            await dialog.ShowDialog(dialog);
         }
-        List<String> imagePaths = new List<string>();
+        List<string> imagePaths = new List<string>();
         try
         {
-            Console.WriteLine(projectRoot);
-            foreach (String dir in Directory.EnumerateDirectories(path))
+            foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 if (IsFilteredDir(dir))
                 {
-                    Console.WriteLine($"Beatmap is already filtered: {dir}");
+                    Console.WriteLine($"Beatmap is already filtered: {System.IO.Path.GetFileName(dir)}");
                     continue;
                 }
-                foreach (String file in Directory.EnumerateFiles(dir))
+                foreach (string file in Directory.EnumerateFiles(dir))
                 {
                     if (file.EndsWith(".png") || file.EndsWith(".jpg") || file.EndsWith(".jpeg"))
                     {
@@ -55,38 +46,14 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            var dialog = new Window
-            {
-                Title = "Error",
-                Width = 300,
-                Height = 150,
-                Content = new TextBlock { Text = "Idk.", Margin = new Avalonia.Thickness(20) }
-            };
-
-            await dialog.ShowDialog(dialog);
+            Console.WriteLine($"Error: {e}");
         }
+        List<ModelOutputItem> unfilteredPaths = GetImageStats(imagePaths);
+        FilterFiles(unfilteredPaths);
 
-        List<ModelOutputItem> filteredImagePaths = Judge(imagePaths);
-        foreach (ModelOutputItem item in filteredImagePaths)
-        {
-            if (item.Prediction)
-                try
-                {
-                    File.Move(item.Path, $"{item.Path}.filtered");
-                    File.Copy($"{projectRoot}\\black\\black{Path.GetExtension(item.Path)}", item.Path);
-                }
-                catch (IOException e)
-                {
-                    Console.WriteLine($"File already filtered: {item.Path}");
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    Console.WriteLine($"no access.");
-                }
-        }
     }
 
-    public static void UndoFilter(String path)
+    public static void HandleUnfilter(string path)
     {
         path = Path.Join(path, "Songs");
         if (!Path.Exists(path))
@@ -95,10 +62,9 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         try
         {
-            Console.WriteLine(projectRoot);
-            foreach (String dir in Directory.EnumerateDirectories(path))
+            foreach (string dir in Directory.EnumerateDirectories(path))
             {
-                foreach (String file in Directory.EnumerateFiles(dir))
+                foreach (string file in Directory.EnumerateFiles(dir))
                 {
                     if (file.EndsWith(".filtered"))
                     {
@@ -112,13 +78,14 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             Console.WriteLine($"error EEEEEEE: {e}");
         }
+        Console.WriteLine("Done with unfilter");
     }
 
-    private static List<ModelOutputItem> Judge(List<String> files)
+    private static List<ModelOutputItem> GetImageStats(List<string> files)
     {
         var payload = new { images = files };
-        String json = JsonSerializer.Serialize(payload);
-        String python = $"{projectRoot}\\.venv\\Scripts\\python.exe";
+        string json = JsonSerializer.Serialize(payload);
+        string python = $"{projectRoot}\\.venv\\Scripts\\python.exe";
 
         ProcessStartInfo psi = new ProcessStartInfo
         {
@@ -130,20 +97,30 @@ public partial class MainWindowViewModel : ViewModelBase
             CreateNoWindow = true
         };
 
-        var process = Process.Start(psi);
+        var process = Process.Start(psi) ?? throw new Exception("ProcessStartInfo cannot be null.");
         process.StandardInput.WriteLine(json);
         process.StandardInput.Close();
-        String output = process.StandardOutput.ReadToEnd();
+        string output = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
         Console.WriteLine("done");
         Console.WriteLine(output);
-        List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output);
-        return modelOutput;
+        try
+        {
+            List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output) ?? throw new Exception("Process returned null.");
+            return modelOutput;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Environment.Exit(-1);
+        }
+        return null;
     }
 
-    private static bool IsFilteredDir(String dir)
+    // Only checks if a filter has been applied at all, not whether a directory has been scanned.
+    private static bool IsFilteredDir(string dir)
     {
-        foreach (String file in Directory.EnumerateFiles(dir))
+        foreach (string file in Directory.EnumerateFiles(dir))
         {
             if (file.EndsWith(".filtered"))
             {
@@ -151,5 +128,27 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
         return false;
+    }
+
+    private static void FilterFiles(List<ModelOutputItem> unfilteredPaths)
+    {
+        foreach (ModelOutputItem item in unfilteredPaths)
+        {
+            if (item.Prediction)
+                try
+                {
+                    File.Move(item.Path, $"{item.Path}.filtered");
+                    File.Copy($"{projectRoot}\\black\\black{Path.GetExtension(item.Path)}", item.Path);
+                    Console.WriteLine($"Filtered {item.Name}");
+                }
+                catch (IOException)
+                {
+                    Console.WriteLine($"File already filtered: {item.Name}");
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine($"no access. Error: {e}");
+                }
+        }
     }
 }

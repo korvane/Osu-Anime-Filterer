@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+
 using osu_filterer.ViewModels;
 namespace osu_filterer.Views;
 
@@ -22,7 +24,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            TopLevel topLevel = GetTopLevel(this);
+            TopLevel topLevel = GetTopLevel(this) ?? throw new Exception("Top level is null.");
             FolderPickerOpenOptions options = new FolderPickerOpenOptions { Title = "Hi", AllowMultiple = false };
             IReadOnlyList<IStorageFolder> tempFolder = await topLevel.StorageProvider.OpenFolderPickerAsync(options);
 
@@ -38,7 +40,7 @@ public partial class MainWindow : Window
         }
     }
 
-    public async void RunFilterer(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
+    public async void HandleFilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
@@ -55,10 +57,10 @@ public partial class MainWindow : Window
         }
         else
         {
-            MainWindowViewModel.FilterImages(osuFile);
+            MainWindowViewModel.HandleFilter(osuFile);
         }
     }
-    public async void UndoFilterer(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
+    public async void HandleUnfilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
@@ -75,7 +77,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            MainWindowViewModel.UndoFilter(osuFile);
+            MainWindowViewModel.HandleUnfilter(osuFile);
         }
     }
 }

@@ -90,26 +90,31 @@ public partial class MainWindowViewModel : ViewModelBase
         string json = JsonSerializer.Serialize(payload);
         string python = $"{projectRoot}\\.venv\\Scripts\\python.exe";
 
-        ProcessStartInfo psi = new ProcessStartInfo
-        {
-            FileName = python,
-            Arguments = $"{projectRoot}\\new_runs.py",
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        var process = Process.Start(psi) ?? throw new Exception("ProcessStartInfo cannot be null.");
-        process.StandardInput.WriteLine(json);
-        process.StandardInput.Close();
-        string output = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-        Console.WriteLine("END MODEL");
         try
         {
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = python,
+                Arguments = $"{projectRoot}\\new_runs.py",
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            var process = Process.Start(psi) ?? throw new Exception("ProcessStartInfo cannot be null.");
+            process.StandardInput.WriteLine(json);
+            process.StandardInput.Close();
+            string output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            Console.WriteLine("END MODEL");
             List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output) ?? throw new Exception("output returned null.");
             return modelOutput;
+        }
+        catch(System.ComponentModel.Win32Exception e)
+        {
+            Console.WriteLine("This app cannot run as a standalone! (Program must be ran from its original folder)");
+            Console.WriteLine(e);
+            Environment.Exit(-1);
         }
         catch (Exception e)
         {

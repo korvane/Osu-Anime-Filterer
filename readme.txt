@@ -3,6 +3,7 @@ Application for replacing all your Osu! beatmaps that contain anime pictures wit
 Program utilizes a ML model trained for detecting anime characters to carry out the replacement.
 
 ``Platform``: Windows
+``Framework``: .NET 10 (required)
 
 ``Usage``
 Download and unzip the exe under 'Releases' on the right.

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace osu_filterer.ViewModels;
@@ -47,6 +48,11 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             Console.WriteLine($"Error: {e}");
         }
+        if(imagePaths.Count == 0)
+        {
+            Console.WriteLine("beatmaps have been filtered!! :P");
+            return;
+        }
         Console.WriteLine($"Start Model: {path}");
         List<ModelOutputItem> unfilteredPaths = RunModel(imagePaths);
         Console.WriteLine($"Filter and Replace: {path}");
@@ -88,7 +94,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var payload = new { images = files };
         string json = JsonSerializer.Serialize(payload);
-        string python = $"{projectRoot}\\.venv\\Scripts\\python.exe";
+        string python = $"{projectRoot}\\python\\python.exe";
 
         try
         {

@@ -15,8 +15,8 @@
     </Design.DataContext>
     <StackPanel Spacing="10" Margin="20">
         <StackPanel Orientation="Horizontal">
-            <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="3" HorizontalAlignment="Center" Height="20" PlaceholderText="file location"></TextBox>
-            <Button HorizontalAlignment="Center" Click="FileExplorer" BorderThickness="3" Margin="5">File Explorer</Button>
+            <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="3" HorizontalAlignment="Center" Height="20" PlaceholderText="Osu! root folder (...\Osu!\)"></TextBox>
+            <Button HorizontalAlignment="Center" Click="FileExplorer" BorderThickness="3" Margin="5">📂</Button>
             <Button HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer</Button>
             <Button HorizontalAlignment="Center" Click="HandleUnfilter" BorderThickness="3" Margin="5">Undo Filterer</Button>
         </StackPanel>

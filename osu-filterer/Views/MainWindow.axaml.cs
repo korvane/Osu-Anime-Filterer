@@ -45,15 +45,7 @@ public partial class MainWindow : Window
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
         {
-            Console.Write("Choose a valid path.");
-            var dialog = new Window
-            {
-                Title = "Error",
-                Width = 300,
-                Height = 150,
-                Content = new TextBlock { Text = "Select a valid file path.", Margin = new Avalonia.Thickness(20) }
-            };
-            await dialog.ShowDialog(dialog);
+            Console.WriteLine("Choose a valid path.");
         }
         else
         {
@@ -65,15 +57,7 @@ public partial class MainWindow : Window
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
         {
-            Console.Write("Choose a valid path.");
-            var dialog = new Window
-            {
-                Title = "Error",
-                Width = 300,
-                Height = 150,
-                Content = new TextBlock { Text = "Select a valid file path.", Margin = new Avalonia.Thickness(20) }
-            };
-            await dialog.ShowDialog(dialog);
+            Console.WriteLine("Choose a valid path.");
         }
         else
         {

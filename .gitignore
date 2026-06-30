@@ -7,11 +7,7 @@ __pycache__/
 
 # .NET / Avalonia
 osu-filterer/bin
-obj/
-*.user
-*.suo
-*.cache
-project.nuget.cache
+osu-filterer/obj
 
 # VS Code
 .vscode

@@ -6,6 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="osu_filterer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/osu-anime-replacer.ico"
         Title="osu_filterer">
 
     <Design.DataContext>

@@ -1,21 +1,23 @@
-# ===== Python =====
+# Python 
 .venv/
 venv/
 __pycache__/
 *.pyc
 
 
-# ===== .NET / Avalonia =====
-bin/
+# .NET / Avalonia
+osu-filterer/bin
 obj/
 *.user
 *.suo
 *.cache
 project.nuget.cache
 
-# ===== VS Code =====
+# VS Code
 .vscode
 
-# ===== OS =====
+# OS
 .DS_Store
 Thumbs.db
+
+.editorconfig

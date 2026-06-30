@@ -90,3 +90,4 @@ c:\code\osu-filterer\osu-filterer\obj\Debug\net10.0\refint\osu-filterer.dll
 c:\code\osu-filterer\osu-filterer\obj\Debug\net10.0\osu-filterer.pdb
 c:\code\osu-filterer\osu-filterer\obj\Debug\net10.0\osu-filterer.genruntimeconfig.cache
 c:\code\osu-filterer\osu-filterer\obj\Debug\net10.0\ref\osu-filterer.dll
+c:\code\osu-filterer\osu-filterer\obj\Debug\net10.0\osu-filterer.sourcelink.json

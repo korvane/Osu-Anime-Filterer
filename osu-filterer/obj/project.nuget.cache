@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "q5PZ/hn9gJU=",
+  "dgSpecHash": "i5CHLRCpHLs=",
   "success": true,
-  "projectFilePath": "C:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj",
+  "projectFilePath": "c:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\drsep_08g98ys\\.nuget\\packages\\avalonia\\12.0.2\\avalonia.12.0.2.nupkg.sha512",
     "C:\\Users\\drsep_08g98ys\\.nuget\\packages\\avalonia.angle.windows.natives\\2.1.25547.20250602\\avalonia.angle.windows.natives.2.1.25547.20250602.nupkg.sha512",

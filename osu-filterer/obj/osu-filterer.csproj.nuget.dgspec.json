@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj": {}
+    "c:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj": {}
   },
   "projects": {
-    "C:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj": {
+    "c:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj",
+        "projectUniqueName": "c:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj",
         "projectName": "osu-filterer",
-        "projectPath": "C:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj",
+        "projectPath": "c:\\code\\osu-filterer\\osu-filterer\\osu-filterer.csproj",
         "packagesPath": "C:\\Users\\drsep_08g98ys\\.nuget\\packages\\",
-        "outputPath": "C:\\code\\osu-filterer\\osu-filterer\\obj\\",
+        "outputPath": "c:\\code\\osu-filterer\\osu-filterer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\drsep_08g98ys\\AppData\\Roaming\\NuGet\\NuGet.Config"

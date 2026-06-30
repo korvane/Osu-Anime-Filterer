@@ -1,2 +1,21 @@
-.vscode
-osu-filterer/bin
+# ===== Python =====
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+
+# ===== .NET / Avalonia =====
+bin/
+obj/
+*.user
+*.suo
+*.cache
+project.nuget.cache
+
+# ===== VS Code =====
+.vscode/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db

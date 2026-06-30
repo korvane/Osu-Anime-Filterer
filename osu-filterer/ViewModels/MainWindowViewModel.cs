@@ -48,8 +48,11 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             Console.WriteLine($"Error: {e}");
         }
-        List<ModelOutputItem> unfilteredPaths = GetImageStats(imagePaths);
+        Console.WriteLine($"Start Model: {path}");
+        List<ModelOutputItem> unfilteredPaths = RunModel(imagePaths);
+        Console.WriteLine($"Filter and Replace: {path}");
         FilterFiles(unfilteredPaths);
+        Console.WriteLine($"replacement done :P");
 
     }
 
@@ -62,6 +65,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         try
         {
+            Console.WriteLine($"Start unfilter at {path}");
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 foreach (string file in Directory.EnumerateFiles(dir))
@@ -76,12 +80,12 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Console.WriteLine($"error EEEEEEE: {e}");
+            Console.WriteLine($"error: {e}");
         }
-        Console.WriteLine("Done with unfilter");
+        Console.WriteLine($"Done with unfilter at {path}");
     }
 
-    private static List<ModelOutputItem> GetImageStats(List<string> files)
+    private static List<ModelOutputItem> RunModel(List<string> files)
     {
         var payload = new { images = files };
         string json = JsonSerializer.Serialize(payload);
@@ -102,11 +106,10 @@ public partial class MainWindowViewModel : ViewModelBase
         process.StandardInput.Close();
         string output = process.StandardOutput.ReadToEnd();
         process.WaitForExit();
-        Console.WriteLine("done");
-        Console.WriteLine(output);
+        Console.WriteLine("END MODEL");
         try
         {
-            List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output) ?? throw new Exception("Process returned null.");
+            List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output) ?? throw new Exception("output returned null.");
             return modelOutput;
         }
         catch (Exception e)
@@ -139,7 +142,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     File.Move(item.Path, $"{item.Path}.filtered");
                     File.Copy($"{projectRoot}\\black\\black{Path.GetExtension(item.Path)}", item.Path);
-                    Console.WriteLine($"Filtered {item.Name}");
+                    Console.WriteLine($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
                 }
                 catch (IOException)
                 {

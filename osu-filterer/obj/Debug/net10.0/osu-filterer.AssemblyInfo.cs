@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("osu-filterer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7ba3d39c1e1bb4dacfcc0a771b8bdec1549bf11b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+92a9be3eda61e195a40fcc9e01c3be5562db2afb")]
 [assembly: System.Reflection.AssemblyProductAttribute("osu-filterer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("osu-filterer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

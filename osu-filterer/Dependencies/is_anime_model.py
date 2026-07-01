@@ -46,8 +46,7 @@ def is_filtered(image_paths):
 
 IMG_SIZE = (160, 160)
 BASE_DIR = Path(__file__).resolve().parent
-
-base_model = keras.models.load_model(BASE_DIR / "ML" / "feature_extractor.keras")
+base_model = keras.models.load_model(BASE_DIR  / "ML" / "feature_extractor.keras")
 with open(BASE_DIR / "ML" / "anime_classifier.pkl", "rb") as f:
     classifier = pickle.load(f)
 

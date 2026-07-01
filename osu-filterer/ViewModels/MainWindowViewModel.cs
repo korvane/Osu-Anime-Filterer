@@ -4,6 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using osu_filterer.Dependencies;
+
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+
+using osu_filterer.Views;
 
 namespace osu_filterer.ViewModels;
 
@@ -16,8 +23,6 @@ public class ModelOutputItem
 }
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private static readonly string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
-
     public static async void HandleFilter(string path)
     {
         path = Path.Join(path, "Songs");
@@ -46,11 +51,12 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
+            Helper.ShowError(e.ToString());
             Console.WriteLine($"Error: {e}");
         }
         if(imagePaths.Count == 0)
         {
-            Console.WriteLine("beatmaps have been filtered!! :P");
+            Console.WriteLine("beatmaps are filtered!! :P");
             return;
         }
         Console.WriteLine($"Start Model: {path}");
@@ -58,7 +64,6 @@ public partial class MainWindowViewModel : ViewModelBase
         Console.WriteLine($"Filter and Replace: {path}");
         FilterFiles(unfilteredPaths);
         Console.WriteLine($"replacement done :P");
-
     }
 
     public static void HandleUnfilter(string path)
@@ -85,6 +90,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
+            Helper.ShowError(e.ToString());
             Console.WriteLine($"error: {e}");
         }
         Console.WriteLine($"Done with unfilter at {path}");
@@ -94,14 +100,15 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var payload = new { images = files };
         string json = JsonSerializer.Serialize(payload);
-        string python = $"{projectRoot}\\python\\python.exe";
+        string python = $"{Helper.projectRoot}\\dependencies\\python\\python.exe";
 
         try
         {
             ProcessStartInfo psi = new ProcessStartInfo
             {
                 FileName = python,
-                Arguments = $"{projectRoot}\\new_runs.py",
+                Arguments = $"{Helper.projectRoot}\\dependencies\\is_anime_model.py",
+                WorkingDirectory=Helper.projectRoot,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -116,18 +123,18 @@ public partial class MainWindowViewModel : ViewModelBase
             List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output) ?? throw new Exception("output returned null.");
             return modelOutput;
         }
-        catch(System.ComponentModel.Win32Exception e)
+        catch (System.ComponentModel.Win32Exception e)
         {
-            Console.WriteLine("This app cannot run as a standalone! (Program must be ran from its original folder)");
+            Helper.ShowError($"This app cannot run as a standalone!\nProgram must be ran from its original folder.\n\nRemember to change the rootDirectory string if necessary.\n\ncurrent directory: {Helper.projectRoot}\n\n python directory:{python}\n\n{e.ToString()}");
             Console.WriteLine(e);
-            Environment.Exit(-1);
         }
         catch (Exception e)
         {
+            Helper.ShowError($"{e.ToString()}");
+
             Console.WriteLine(e);
-            Environment.Exit(-1);
         }
-        return null;
+        return new List<ModelOutputItem>();
     }
 
     // Only checks if a filter has been applied at all, not whether a directory has been scanned.
@@ -151,15 +158,16 @@ public partial class MainWindowViewModel : ViewModelBase
                 try
                 {
                     File.Move(item.Path, $"{item.Path}.filtered");
-                    File.Copy($"{projectRoot}\\black\\black{Path.GetExtension(item.Path)}", item.Path);
+                    File.Copy($"{Helper.projectRoot}\\Dependencies\\black\\black{Path.GetExtension(item.Path)}", item.Path);
                     Console.WriteLine($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
                 }
-                catch (IOException)
+                catch (IOException e)
                 {
                     Console.WriteLine($"File already filtered: {item.Name}");
                 }
                 catch (UnauthorizedAccessException e)
                 {
+                    Helper.ShowError(e.ToString());
                     Console.WriteLine($"no access. Error: {e}");
                 }
         }

@@ -27,7 +27,7 @@ public partial class MainWindow : Window
             TopLevel topLevel = GetTopLevel(this) ?? throw new Exception("Top level is null.");
             FolderPickerOpenOptions options = new FolderPickerOpenOptions { Title = "Hi", AllowMultiple = false };
             IReadOnlyList<IStorageFolder> tempFolder = await topLevel.StorageProvider.OpenFolderPickerAsync(options);
-
+            
             if (tempFolder.Count > 0)
             {
                 osuFile = tempFolder[0].Path.LocalPath;

@@ -1,8 +1,5 @@
 # Python 
-venv/
-__pycache__/
-*.pyc
-
+osu-filterer/Dependencies/python
 
 # .NET / Avalonia
 osu-filterer/bin
@@ -16,3 +13,5 @@ osu-filterer/obj
 Thumbs.db
 
 .editorconfig
+
+publish.zip

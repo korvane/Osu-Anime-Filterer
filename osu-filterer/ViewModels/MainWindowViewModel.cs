@@ -161,7 +161,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     File.Copy($"{Helper.projectRoot}\\Dependencies\\black\\black{Path.GetExtension(item.Path)}", item.Path);
                     Console.WriteLine($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
                 }
-                catch (IOException e)
+                catch (IOException)
                 {
                     Console.WriteLine($"File already filtered: {item.Name}");
                 }

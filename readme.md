@@ -11,6 +11,7 @@ Program utilizes a ML model trained for detecting anime characters to carry out 
 
 ## Usage
 Download and unzip the exe under 'Releases' to the right.
+Currently you cannot replace individual images; program runs through the whole directory by default.
 
 ## Features
 * Replace all anime images with a black image

@@ -37,7 +37,6 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 if (IsFilteredDir(dir))
                 {
-                    Console.WriteLine($"Beatmap is already filtered: {System.IO.Path.GetFileName(dir)}");
                     continue;
                 }
                 foreach (string file in Directory.EnumerateFiles(dir))
@@ -47,6 +46,7 @@ public partial class MainWindowViewModel : ViewModelBase
                         imagePaths.Add(file);
                     }
                 }
+                File.WriteAllText(Path.Join(dir, ".filtered"), "");
             }
         }
         catch (Exception e)
@@ -80,12 +80,13 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 foreach (string file in Directory.EnumerateFiles(dir))
                 {
-                    if (file.EndsWith(".filtered"))
+                    if (!file.EndsWith("\\.filtered") && file.EndsWith(".filtered"))
                     {
                         File.Delete(file.Substring(0, file.IndexOf(".filtered")));
                         File.Move(file, file.Substring(0, file.IndexOf(".filtered")));
                     }
                 }
+                File.Delete(Path.Join(dir, ".filtered"));
             }
         }
         catch (Exception e)

@@ -26,10 +26,10 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     public static async Task HandleFilter(string? path)
     {
-        path = Path.Join(path, "Songs");
         if (!Path.Exists(path))
         {
             Helper.LogMessage("Choose a valid path.");
+            return;
         }
         List<string> imagePaths = new List<string>();
         try
@@ -68,7 +68,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public static void HandleUnfilter(string path)
     {
-        path = Path.Join(path, "Songs");
         if (!Path.Exists(path))
         {
             Helper.LogMessage("Choose a valid path.");

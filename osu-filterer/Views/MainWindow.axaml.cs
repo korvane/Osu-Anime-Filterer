@@ -18,7 +18,7 @@ namespace osu_filterer.Views;
 
 public partial class MainWindow : Window
 {
-    public String osuSongsFile;
+    public String osuFile;
     public Progress<string> progress {get; set;}
 
     public MainWindow()
@@ -26,7 +26,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         FilePathTextBox.Text = "";
         ConsoleGUI.Text = "";
-        osuSongsFile = "";
+        osuFile = "";
         string installCheck = Path.Combine(Helper.projectRoot, "Dependencies", "python", "CompletedInstall.txt");
         progress = new Progress<string>(message =>
             {
@@ -44,9 +44,7 @@ public partial class MainWindow : Window
         Helper.SetProgress(progress);
         Loaded += async(_,_) =>
         {
-                ChooseFile.IsEnabled = false;
-                Filter.IsEnabled = false;
-                Unfilter.IsEnabled = false;
+                enableButtons(false);
 
                 try
                 {
@@ -54,9 +52,7 @@ public partial class MainWindow : Window
                 }
                 finally
                 {
-                    ChooseFile.IsEnabled = true;
-                    Filter.IsEnabled = true;
-                    Unfilter.IsEnabled = true;
+                    enableButtons(true);
                 }
         };
         
@@ -72,8 +68,8 @@ public partial class MainWindow : Window
             
             if (tempFolder.Count > 0)
             {
-                osuSongsFile = tempFolder[0].Path.LocalPath;
-                FilePathTextBox.Text = osuSongsFile;
+                osuFile = tempFolder[0].Path.LocalPath;
+                FilePathTextBox.Text = osuFile;
             }
         }
         catch (Exception e)
@@ -85,25 +81,47 @@ public partial class MainWindow : Window
     public async void HandleFilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         Helper.LogMessage("");
-        if (Path.Exists(osuSongsFile))
+        enableButtons(false);
+         String path = Path.Join(osuFile, "Songs");
+        if (!Path.Exists(path))
         {
-            await Task.Run(() => MainWindowViewModel.HandleFilter(osuSongsFile));
+            Helper.LogMessage("Choose a valid path - your Osu! root folder (...\\Osu!\\)");
         }
         else
         {
-            Helper.LogMessage("Choose a valid path.");
+            await Task.Run(() => MainWindowViewModel.HandleFilter(path));
         }
+        enableButtons(true);
+        
     }
     public async void HandleUnfilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         Helper.LogMessage("");
-        if (!Path.Exists(osuSongsFile))
+        enableButtons(false);
+        String path = Path.Join(osuFile, "Songs");
+        if (!Path.Exists(path))
         {
-            Helper.LogMessage("Choose a valid path.");
+            Helper.LogMessage("Choose a valid path - your Osu! root folder (...\\Osu!\\)");
         }
         else
         {
-            MainWindowViewModel.HandleUnfilter(osuSongsFile);
+            MainWindowViewModel.HandleUnfilter(path);
+        }
+        enableButtons(true);
+    }
+    private void enableButtons(bool enable)
+    {
+        if (enable)
+        {
+            ChooseFile.IsEnabled = true;
+            Filter.IsEnabled = true;
+            Unfilter.IsEnabled = true;
+        }
+        else
+        {
+            ChooseFile.IsEnabled = false;
+            Filter.IsEnabled = false;
+            Unfilter.IsEnabled = false;
         }
     }
 }

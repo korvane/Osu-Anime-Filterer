@@ -168,7 +168,7 @@ public static class Helper
         await process.WaitForExitAsync();
         if (process.ExitCode != 0)
         {
-            LogMessage($"\nDependencies Install failed. Make sure you set the correct project root.\nCurrent: {projectRoot}\nIs this the location of your unzipped folder?\nyou should review and change the code if necessary(Dependencies\Helper.cs line 23)");
+            LogMessage($"\nDependencies Install failed. Make sure you set the correct project root.\nCurrent: {projectRoot}\nIs this the location of your unzipped folder?\nyou should review and change the code if necessary(Dependencies\\Helper.cs line 23)");
             return;
         }
         LogMessage("Finished Python Dependencies install.");

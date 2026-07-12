@@ -11,6 +11,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 
 using osu_filterer.Views;
+using System.Threading.Tasks;
 
 namespace osu_filterer.ViewModels;
 
@@ -23,12 +24,12 @@ public class ModelOutputItem
 }
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public static async void HandleFilter(string path)
+    public static async Task HandleFilter(string? path)
     {
         path = Path.Join(path, "Songs");
         if (!Path.Exists(path))
         {
-            Helper.ShowErrorConsole("Choose a valid path.");
+            Helper.LogMessage("Choose a valid path.");
         }
         List<string> imagePaths = new List<string>();
         try
@@ -51,19 +52,19 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Helper.ShowErrorConsole(e.ToString());
-            Helper.ShowErrorConsole($"Error: {e}");
+            Helper.LogMessage(e.ToString());
+            Helper.LogMessage($"Error: {e}");
         }
         if(imagePaths.Count == 0)
         {
-            Helper.ShowErrorConsole("beatmaps are filtered!! :P");
+            Helper.LogMessage("beatmaps are filtered!! :P");
             return;
         }
-        Helper.ShowErrorConsole($"Start Model: {path}");
-        List<ModelOutputItem> unfilteredPaths = RunModel(imagePaths);
-        Helper.ShowErrorConsole($"Filter and Replace: {path}");
+        Helper.LogMessage($"Start Model: {path}\n");
+        List<ModelOutputItem> unfilteredPaths = await RunModel(imagePaths);
+        Helper.LogMessage($"\nFilter and Replace: {path}\n");
         FilterFiles(unfilteredPaths);
-        Helper.ShowErrorConsole($"replacement done :P");
+        Helper.LogMessage($"\nreplacement done :P");
     }
 
     public static void HandleUnfilter(string path)
@@ -75,7 +76,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         try
         {
-            Helper.ShowErrorConsole($"Start unfilter at {path}");
+            Helper.LogMessage($"Start unfilter at {path}\n");
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 foreach (string file in Directory.EnumerateFiles(dir))
@@ -91,13 +92,13 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Helper.ShowErrorConsole(e.ToString());
-            Helper.ShowErrorConsole($"error: {e}");
+            Helper.LogMessage(e.ToString());
+            Helper.LogMessage($"error: {e}");
         }
-        Helper.ShowErrorConsole($"Done with unfilter at {path}");
+        Helper.LogMessage($"Done with unfilter at {path}");
     }
 
-    private static List<ModelOutputItem> RunModel(List<string> files)
+    private static async Task<List<ModelOutputItem>> RunModel(List<string> files)
     {
         var payload = new { images = files };
         string json = JsonSerializer.Serialize(payload);
@@ -112,26 +113,35 @@ public partial class MainWindowViewModel : ViewModelBase
                 WorkingDirectory=Helper.projectRoot,
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
             var process = Process.Start(psi) ?? throw new Exception("ProcessStartInfo cannot be null.");
             process.StandardInput.WriteLine(json);
             process.StandardInput.Close();
-            string output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-            Helper.ShowErrorConsole("END MODEL");
+            process.ErrorDataReceived += (_, e) =>
+            {
+                if(e.Data != null)
+                {
+                    Helper.LogMessage(e.Data);
+                }
+            };
+            process.BeginErrorReadLine();
+            string output = await process.StandardOutput.ReadToEndAsync();
+            await process.WaitForExitAsync();
+            Helper.LogMessage("END MODEL");
             List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output) ?? throw new Exception("output returned null.");
             return modelOutput;
         }
         catch (System.ComponentModel.Win32Exception e)
         {
-            Helper.ShowErrorConsole($"This app cannot run as a standalone!\nProgram must be ran from its original folder.\n\nRemember to change the rootDirectory string if necessary.\n\ncurrent directory: {Helper.projectRoot}\n\n python directory:{python}\n\n{e.ToString()}");
-            Helper.ShowErrorConsole(e.Message);
+            Helper.LogMessage($"This app cannot run as a standalone!\nProgram must be ran from its original folder.\n\nRemember to change the rootDirectory string if necessary.\n\ncurrent directory: {Helper.projectRoot}\n\n python directory:{python}\n\n{e.ToString()}");
+            Helper.LogMessage(e.Message);
         }
         catch (Exception e)
         {
-            Helper.ShowErrorConsole($"{e.Message}");
+            Helper.LogMessage($"{e.Message}");
         }
         return new List<ModelOutputItem>();
     }
@@ -158,16 +168,16 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     File.Move(item.Path, $"{item.Path}.filtered");
                     File.Copy($"{Helper.projectRoot}\\Dependencies\\black\\black{Path.GetExtension(item.Path)}", item.Path);
-                    Helper.ShowErrorConsole($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
+                    Helper.LogMessage($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
                 }
                 catch (IOException)
                 {
-                    Helper.ShowErrorConsole($"File already filtered: {item.Name}");
+                    Helper.LogMessage($"File already filtered: {item.Name}");
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    Helper.ShowErrorConsole(e.Message);
-                    Helper.ShowErrorConsole($"no access. Error: {e}");
+                    Helper.LogMessage(e.Message);
+                    Helper.LogMessage($"no access. Error: {e}");
                 }
         }
     }

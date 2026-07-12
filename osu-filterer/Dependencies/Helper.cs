@@ -20,38 +20,22 @@ public static class Helper
     // public static readonly string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
     public static readonly string projectRoot = Path.GetFullPath(AppContext.BaseDirectory);
     private static IProgress<string>? consoleProgress;
-    public static void ShowError(string message)
-    {
-        Window parent = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow
-    ?? throw new InvalidOperationException("Main window not available.");
-        var dialog = new Window
-        {
-            Title = "Error",
-            Width = 400,
-            Height = 200,
-            Content = new SelectableTextBlock
-            {
-                Text = message,
-                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-                Margin = new Thickness(20)
-            }
-        };
 
-        dialog.Show(parent);
-    }
     public static void SetProgress(IProgress<string> progress)
     {
         consoleProgress = progress;
     }
-    public static void ShowErrorConsole(string message)
+
+    public static void LogMessage(string message)
     {
         consoleProgress?.Report(message);
     }
-    public static async Task DownloadPython(bool completed, IProgress<string> progress)
+
+    public static async Task DownloadPython(bool completed)
     {
         if (completed)
         {
-            progress.Report("Python dependencies already installed\n");
+            LogMessage("Python dependencies already installed\n");
             return;
         }
         string dependencies = Path.Combine(Helper.projectRoot, "Dependencies");
@@ -65,7 +49,7 @@ public static class Helper
         try
         {
             //install embeddable python
-            progress.Report("\nPulling new python env...\n");
+            LogMessage("\nPulling new python env...\n");
             string zipPath = Path.Combine(Helper.projectRoot, "python.zip");
             using (HttpClient client = new())
             {
@@ -73,10 +57,10 @@ public static class Helper
                 await using var file = File.Create(zipPath);
                 await stream.CopyToAsync(file);
             }
-            progress.Report("\nPull complete.\n");
+            LogMessage("\nPull complete.\n");
             
             //extract 
-            progress.Report("\nExtracting python env...\n");
+            LogMessage("\nExtracting python env...\n");
             if (Directory.Exists(pythonDir))
                 Directory.Delete(pythonDir, true);
             try
@@ -87,34 +71,34 @@ public static class Helper
             {
                 File.Delete(zipPath);
             }
-            progress.Report("\nExtract complete.\n");
+            LogMessage("\nExtract complete.\n");
 
             //download get-pip
-            progress.Report("\nPulling get-pip...\n");
+            LogMessage("\nPulling get-pip...\n");
             using (HttpClient client = new())
             {
                 await using var stream = await client.GetStreamAsync("https://bootstrap.pypa.io/get-pip.py");
                 await using var file = File.Create(getPip);
                 await stream.CopyToAsync(file);
             }
-            progress.Report("\nPull complete.\n");
+            LogMessage("\nPull complete.\n");
 
             //uncomment python313._pth import for installing pip
-            progress.Report("\nUncommenting python313._pth import for installing pip...\n");
+            LogMessage("\nUncommenting python313._pth import for installing pip...\n");
             string pthFile = Directory.GetFiles(pythonDir, "python*._pth").Single();
             string contents = File.ReadAllText(pthFile);
             contents = contents.Replace("#import site", "import site");
             File.WriteAllText(pthFile, contents);
-            progress.Report("\nOperation complete.\n");
+            LogMessage("\nOperation complete.\n");
 
         }
         catch(Exception e)
         {
-            progress.Report(e.Message);
+            LogMessage(e.Message);
         }
     
         //install pip
-        progress.Report("\nInstalling pip...\n");
+        LogMessage("\nInstalling pip...\n");
         var installPip = new ProcessStartInfo
         {
             FileName = pythonexe,
@@ -129,14 +113,14 @@ public static class Helper
         {
             if(e.Data != null)
             {
-                progress.Report(e.Data);
+                LogMessage(e.Data);
             }
         };
         process.ErrorDataReceived += (_, e) =>
         {
             if(e.Data != null)
             {
-                progress.Report(e.Data);
+                LogMessage(e.Data);
             }
         };
         process.BeginOutputReadLine();
@@ -144,13 +128,13 @@ public static class Helper
         await process.WaitForExitAsync();
         if (process.ExitCode != 0)
         {
-            progress.Report("\nRequirements install failed\n");
+            LogMessage("\nRequirements install failed\n");
             throw new Exception("Requirements install failed");
         }
             
 
         //install requirements
-        progress.Report("\nBeginning Python Dependencies install...\n");
+        LogMessage("\nBeginning Python Dependencies install...\n");
         var installRequirements = new ProcessStartInfo
         {
             FileName = pythonexe,
@@ -165,14 +149,14 @@ public static class Helper
         {
             if(e.Data != null)
             {
-                progress.Report(e.Data);
+                LogMessage(e.Data);
             }
         };
         process.ErrorDataReceived += (_, e) =>
         {
             if(e.Data != null)
             {
-                progress.Report(e.Data);
+                LogMessage(e.Data);
             }
         };
         process.BeginOutputReadLine();
@@ -180,11 +164,11 @@ public static class Helper
         await process.WaitForExitAsync();
         if (process.ExitCode != 0)
         {
-            progress.Report("\nDependencies install failed\n");
+            LogMessage("\nDependencies install failed\n");
             throw new Exception("Requirements install failed");
         }
-        progress.Report("Finished Python Dependencies install.");
-        progress.Report("Setup complete!");
+        LogMessage("Finished Python Dependencies install.");
+        LogMessage("Setup complete!");
         File.WriteAllText(install, "");
     }
 }

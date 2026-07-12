@@ -30,7 +30,14 @@ public partial class MainWindow : Window
         string installCheck = Path.Combine(Helper.projectRoot, "Dependencies", "python", "CompletedInstall.txt");
         progress = new Progress<string>(message =>
             {
-                ConsoleGUI.Text += message + Environment.NewLine;
+                if(message.Equals(""))
+                {
+                    ConsoleGUI.Text = "";
+                }
+                else
+                {
+                    ConsoleGUI.Text += message + Environment.NewLine;
+                }
                 ConsoleGUI.CaretIndex = ConsoleGUI.Text.Length;
                 ConsoleGUI.ScrollToLine(ConsoleGUI.GetLineCount() - 1);
             });
@@ -43,7 +50,7 @@ public partial class MainWindow : Window
 
                 try
                 {
-                    await Helper.DownloadPython(File.Exists(installCheck), progress);
+                    await Helper.DownloadPython(File.Exists(installCheck));
                 }
                 finally
                 {
@@ -71,28 +78,31 @@ public partial class MainWindow : Window
         }
         catch (Exception e)
         {
-            Helper.ShowErrorConsole($"Error: {e}");
+            Helper.LogMessage($"Error: {e}");
         }
     }
 
     public async void HandleFilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
+        Helper.LogMessage("");
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
         {
-            Helper.ShowErrorConsole("Choose a valid path.");
+            Helper.LogMessage("Choose a valid path.");
         }
         else
         {
-            MainWindowViewModel.HandleFilter(osuFile);
+            string? tmp = FilePathTextBox.Text;
+            await Task.Run(() => MainWindowViewModel.HandleFilter(tmp));
         }
     }
     public async void HandleUnfilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
+        Helper.LogMessage("");
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
         {
-            Helper.ShowErrorConsole("Choose a valid path.");
+            Helper.LogMessage("Choose a valid path.");
         }
         else
         {

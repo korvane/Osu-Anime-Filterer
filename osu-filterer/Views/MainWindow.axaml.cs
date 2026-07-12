@@ -18,7 +18,7 @@ namespace osu_filterer.Views;
 
 public partial class MainWindow : Window
 {
-    public String osuFile;
+    public String osuSongsFile;
     public Progress<string> progress {get; set;}
 
     public MainWindow()
@@ -26,7 +26,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         FilePathTextBox.Text = "";
         ConsoleGUI.Text = "";
-        osuFile = "";
+        osuSongsFile = "";
         string installCheck = Path.Combine(Helper.projectRoot, "Dependencies", "python", "CompletedInstall.txt");
         progress = new Progress<string>(message =>
             {
@@ -72,8 +72,8 @@ public partial class MainWindow : Window
             
             if (tempFolder.Count > 0)
             {
-                osuFile = tempFolder[0].Path.LocalPath;
-                FilePathTextBox.Text = osuFile;
+                osuSongsFile = tempFolder[0].Path.LocalPath;
+                FilePathTextBox.Text = osuSongsFile;
             }
         }
         catch (Exception e)
@@ -85,28 +85,25 @@ public partial class MainWindow : Window
     public async void HandleFilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         Helper.LogMessage("");
-        String path = Path.Join(osuFile, "Songs");
-        if (!Path.Exists(path))
+        if (Path.Exists(osuSongsFile))
         {
-            Helper.LogMessage("Choose a valid path.");
+            await Task.Run(() => MainWindowViewModel.HandleFilter(osuSongsFile));
         }
         else
         {
-            string? tmp = FilePathTextBox.Text;
-            await Task.Run(() => MainWindowViewModel.HandleFilter(tmp));
+            Helper.LogMessage("Choose a valid path.");
         }
     }
     public async void HandleUnfilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         Helper.LogMessage("");
-        String path = Path.Join(osuFile, "Songs");
-        if (!Path.Exists(path))
+        if (!Path.Exists(osuSongsFile))
         {
             Helper.LogMessage("Choose a valid path.");
         }
         else
         {
-            MainWindowViewModel.HandleUnfilter(osuFile);
+            MainWindowViewModel.HandleUnfilter(osuSongsFile);
         }
     }
 }

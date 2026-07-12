@@ -19,7 +19,10 @@ public static class Helper
 {
     // Run this if you are building manually. This should point to .\osu-filterer\osu-filterer. if you arent building with avalonia then adjust accordingly.:
     // public static readonly string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
-    public static readonly string projectRoot = Path.GetFullPath(AppContext.BaseDirectory);
+    public static string projectRoot =
+    new DirectoryInfo(AppContext.BaseDirectory).Parent?.Name == "Debug"
+        ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."))
+        : AppContext.BaseDirectory;
     private static IProgress<string>? consoleProgress;
 
     public static void SetProgress(IProgress<string> progress)
@@ -145,7 +148,7 @@ public static class Helper
             UseShellExecute = false,
             CreateNoWindow = true
         };
-        process = Process.Start(installRequirements)?? throw new Exception("Dependencies Install failed");
+        process = Process.Start(installRequirements)?? throw new Exception("Dependencies Install failed.");
         process.OutputDataReceived += (_, e) =>
         {
             if(e.Data != null)
@@ -165,7 +168,7 @@ public static class Helper
         await process.WaitForExitAsync();
         if (process.ExitCode != 0)
         {
-            LogMessage("\nDependencies install failed\n");
+            LogMessage($"\nDependencies Install failed. Make sure you set the correct project root.\nCurrent: {projectRoot}\nIs this the location of your unzipped folder?\nyou should review and change the code if necessary(Dependencies\Helper.cs line 23)");
             return;
         }
         LogMessage("Finished Python Dependencies install.");

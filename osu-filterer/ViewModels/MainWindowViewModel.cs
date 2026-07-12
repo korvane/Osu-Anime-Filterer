@@ -59,7 +59,7 @@ public partial class MainWindowViewModel : ViewModelBase
             Helper.LogMessage("beatmaps are filtered!! :P");
             return;
         }
-        Helper.LogMessage($"Start Model: {path}\n");
+        Helper.LogMessage($"Start Model: {path}\n\n...\n\n");
         List<ModelOutputItem> unfilteredPaths = await RunModel(imagePaths);
         Helper.LogMessage($"\nFilter and Replace: {path}\n");
         FilterFiles(unfilteredPaths);

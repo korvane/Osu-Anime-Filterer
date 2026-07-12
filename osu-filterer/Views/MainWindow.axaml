@@ -17,13 +17,13 @@
     </Design.DataContext>
     <StackPanel Spacing="10" Margin="20">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-            <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="3" Height="20" PlaceholderText="Osu! root folder (...\Osu!\)"></TextBox>
+            <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="2" Height="20" VerticalContentAlignment="Center" PlaceholderText="Osu! songs folder (...\Osu!\Songs) (Or any folder)"></TextBox>
             <Button x:Name="ChooseFile" HorizontalAlignment="Center" Click="FileExplorer" BorderThickness="3" Margin="5">📂</Button>
             <Button x:Name="Filter" HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer</Button>
             <Button x:Name="Unfilter" HorizontalAlignment="Center" Click="HandleUnfilter" BorderThickness="3" Margin="5">Undo Filterer</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-            <TextBox x:Name="ConsoleGUI" TextWrapping="Wrap" AcceptsReturn="True" Focusable="False" IsReadOnly="True" BorderThickness="1" HorizontalAlignment="Stretch" Width="661" Height="350" PlaceholderText="Console output"></TextBox>
+            <TextBox x:Name="ConsoleGUI" TextWrapping="Wrap" AcceptsReturn="True" Focusable="False" IsReadOnly="True" BorderThickness="3" HorizontalAlignment="Stretch" Width="661" Height="350" PlaceholderText="Console output"></TextBox>
         </StackPanel>
     </StackPanel>
 </Window>

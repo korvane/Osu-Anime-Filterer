@@ -4,6 +4,12 @@ using Avalonia.Controls.ApplicationLifetimes;
 
 using System.IO;
 using System;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.IO.Compression;
+using System.Linq;
+using System.Diagnostics;
+using Avalonia.Threading;
 
 namespace osu_filterer.Dependencies;
 public static class Helper
@@ -29,5 +35,145 @@ public static class Helper
         };
 
         dialog.Show(parent);
+    }
+    public static async Task DownloadPython(bool completed, IProgress<string> progress)
+    {
+        if (completed)
+        {
+            progress.Report("Python dependencies already installed\n");
+            return;
+        }
+        string dependencies = Path.Combine(Helper.projectRoot, "Dependencies");
+        string pythonDir = Path.Combine(dependencies, "python");
+        string pythonexe = Path.Combine(pythonDir, "python.exe");
+        string getPip = Path.Combine(pythonDir, "get-pip.py");
+        string requirements = Path.Combine(dependencies, "requirements.txt");
+        string install = Path.Combine(pythonDir, "CompletedInstall.txt");
+
+        
+        try
+        {
+            //install embeddable python
+            progress.Report("\nPulling new python env...\n");
+            string zipPath = Path.Combine(Helper.projectRoot, "python.zip");
+            using (HttpClient client = new())
+            {
+                await using var stream = await client.GetStreamAsync("https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip");
+                await using var file = File.Create(zipPath);
+                await stream.CopyToAsync(file);
+            }
+            progress.Report("\nPull complete.\n");
+            
+            //extract 
+            progress.Report("\nExtracting python env...\n");
+            if (Directory.Exists(pythonDir))
+                Directory.Delete(pythonDir, true);
+            try
+            {
+                ZipFile.ExtractToDirectory(zipPath, pythonDir);
+            }
+            finally
+            {
+                File.Delete(zipPath);
+            }
+            progress.Report("\nExtract complete.\n");
+
+            //download get-pip
+            progress.Report("\nPulling get-pip...\n");
+            using (HttpClient client = new())
+            {
+                await using var stream = await client.GetStreamAsync("https://bootstrap.pypa.io/get-pip.py");
+                await using var file = File.Create(getPip);
+                await stream.CopyToAsync(file);
+            }
+            progress.Report("\nPull complete.\n");
+
+            //uncomment python313._pth import for installing pip
+            progress.Report("\nUncommenting python313._pth import for installing pip...\n");
+            string pthFile = Directory.GetFiles(pythonDir, "python*._pth").Single();
+            string contents = File.ReadAllText(pthFile);
+            contents = contents.Replace("#import site", "import site");
+            File.WriteAllText(pthFile, contents);
+            progress.Report("\nOperation complete.\n");
+
+        }
+        catch(Exception e)
+        {
+            progress.Report(e.Message);
+        }
+    
+        //install pip
+        progress.Report("\nInstalling pip...\n");
+        var installPip = new ProcessStartInfo
+        {
+            FileName = pythonexe,
+            Arguments = getPip,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        var process = Process.Start(installPip)?? throw new Exception("Pip Install failed");
+        process.OutputDataReceived += (_, e) =>
+        {
+            if(e.Data != null)
+            {
+                progress.Report(e.Data);
+            }
+        };
+        process.ErrorDataReceived += (_, e) =>
+        {
+            if(e.Data != null)
+            {
+                progress.Report(e.Data);
+            }
+        };
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        await process.WaitForExitAsync();
+        if (process.ExitCode != 0)
+        {
+            progress.Report("\nRequirements install failed\n");
+            throw new Exception("Requirements install failed");
+        }
+            
+
+        //install requirements
+        progress.Report("\nBeginning Python Dependencies install...\n");
+        var installRequirements = new ProcessStartInfo
+        {
+            FileName = pythonexe,
+            Arguments = $"-m pip install -r {requirements}",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        process = Process.Start(installRequirements)?? throw new Exception("Dependencies Install failed");
+        process.OutputDataReceived += (_, e) =>
+        {
+            if(e.Data != null)
+            {
+                progress.Report(e.Data);
+            }
+        };
+        process.ErrorDataReceived += (_, e) =>
+        {
+            if(e.Data != null)
+            {
+                progress.Report(e.Data);
+            }
+        };
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
+        await process.WaitForExitAsync();
+        if (process.ExitCode != 0)
+        {
+            progress.Report("\nDependencies install failed\n");
+            throw new Exception("Requirements install failed");
+        }
+        progress.Report("Finished Python Dependencies install.");
+        progress.Report("Setup complete!");
+        File.WriteAllText(install, "");
     }
 }

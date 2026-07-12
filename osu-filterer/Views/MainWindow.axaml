@@ -3,7 +3,7 @@
         xmlns:vm="using:osu_filterer.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
         x:Class="osu_filterer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/osu-anime-replacer.ico"
@@ -16,10 +16,13 @@
     </Design.DataContext>
     <StackPanel Spacing="10" Margin="20">
         <StackPanel Orientation="Horizontal">
-            <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="3" HorizontalAlignment="Center" Height="20" PlaceholderText="Osu! root folder (...\Osu!\)"></TextBox>
-            <Button HorizontalAlignment="Center" Click="FileExplorer" BorderThickness="3" Margin="5">📂</Button>
-            <Button HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer</Button>
-            <Button HorizontalAlignment="Center" Click="HandleUnfilter" BorderThickness="3" Margin="5">Undo Filterer</Button>
+            <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="3" HorizontalAlignment="Left" Height="20" PlaceholderText="Osu! root folder (...\Osu!\)"></TextBox>
+            <Button x:Name="ChooseFile" HorizontalAlignment="Center" Click="FileExplorer" BorderThickness="3" Margin="5">📂</Button>
+            <Button x:Name="Filter" HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer</Button>
+            <Button x:Name="Unfilter" HorizontalAlignment="Center" Click="HandleUnfilter" BorderThickness="3" Margin="5">Undo Filterer</Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox x:Name="ConsoleGUI" TextWrapping="Wrap" AcceptsReturn="True" Focusable="False" IsReadOnly="True" BorderThickness="1" HorizontalAlignment="Left" Width="500" Height="350" PlaceholderText="Console output"></TextBox>
         </StackPanel>
     </StackPanel>
 </Window>

@@ -34,6 +34,7 @@ public partial class MainWindow : Window
                 ConsoleGUI.CaretIndex = ConsoleGUI.Text.Length;
                 ConsoleGUI.ScrollToLine(ConsoleGUI.GetLineCount() - 1);
             });
+        Helper.SetProgress(progress);
         Loaded += async(_,_) =>
         {
                 ChooseFile.IsEnabled = false;
@@ -70,7 +71,7 @@ public partial class MainWindow : Window
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error: {e}");
+            Helper.ShowErrorConsole($"Error: {e}");
         }
     }
 
@@ -79,7 +80,7 @@ public partial class MainWindow : Window
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
         {
-            Console.WriteLine("Choose a valid path.");
+            Helper.ShowErrorConsole("Choose a valid path.");
         }
         else
         {
@@ -91,7 +92,7 @@ public partial class MainWindow : Window
         String path = Path.Join(osuFile, "Songs");
         if (!Path.Exists(path))
         {
-            Console.WriteLine("Choose a valid path.");
+            Helper.ShowErrorConsole("Choose a valid path.");
         }
         else
         {

@@ -28,7 +28,7 @@ public partial class MainWindowViewModel : ViewModelBase
         path = Path.Join(path, "Songs");
         if (!Path.Exists(path))
         {
-            Console.Write("Choose a valid path.");
+            Helper.ShowErrorConsole("Choose a valid path.");
         }
         List<string> imagePaths = new List<string>();
         try
@@ -51,19 +51,19 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Helper.ShowError(e.ToString());
-            Console.WriteLine($"Error: {e}");
+            Helper.ShowErrorConsole(e.ToString());
+            Helper.ShowErrorConsole($"Error: {e}");
         }
         if(imagePaths.Count == 0)
         {
-            Console.WriteLine("beatmaps are filtered!! :P");
+            Helper.ShowErrorConsole("beatmaps are filtered!! :P");
             return;
         }
-        Console.WriteLine($"Start Model: {path}");
+        Helper.ShowErrorConsole($"Start Model: {path}");
         List<ModelOutputItem> unfilteredPaths = RunModel(imagePaths);
-        Console.WriteLine($"Filter and Replace: {path}");
+        Helper.ShowErrorConsole($"Filter and Replace: {path}");
         FilterFiles(unfilteredPaths);
-        Console.WriteLine($"replacement done :P");
+        Helper.ShowErrorConsole($"replacement done :P");
     }
 
     public static void HandleUnfilter(string path)
@@ -75,7 +75,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         try
         {
-            Console.WriteLine($"Start unfilter at {path}");
+            Helper.ShowErrorConsole($"Start unfilter at {path}");
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
                 foreach (string file in Directory.EnumerateFiles(dir))
@@ -91,10 +91,10 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Helper.ShowError(e.ToString());
-            Console.WriteLine($"error: {e}");
+            Helper.ShowErrorConsole(e.ToString());
+            Helper.ShowErrorConsole($"error: {e}");
         }
-        Console.WriteLine($"Done with unfilter at {path}");
+        Helper.ShowErrorConsole($"Done with unfilter at {path}");
     }
 
     private static List<ModelOutputItem> RunModel(List<string> files)
@@ -120,20 +120,18 @@ public partial class MainWindowViewModel : ViewModelBase
             process.StandardInput.Close();
             string output = process.StandardOutput.ReadToEnd();
             process.WaitForExit();
-            Console.WriteLine("END MODEL");
+            Helper.ShowErrorConsole("END MODEL");
             List<ModelOutputItem> modelOutput = JsonSerializer.Deserialize<List<ModelOutputItem>>(output) ?? throw new Exception("output returned null.");
             return modelOutput;
         }
         catch (System.ComponentModel.Win32Exception e)
         {
-            Helper.ShowError($"This app cannot run as a standalone!\nProgram must be ran from its original folder.\n\nRemember to change the rootDirectory string if necessary.\n\ncurrent directory: {Helper.projectRoot}\n\n python directory:{python}\n\n{e.ToString()}");
-            Console.WriteLine(e);
+            Helper.ShowErrorConsole($"This app cannot run as a standalone!\nProgram must be ran from its original folder.\n\nRemember to change the rootDirectory string if necessary.\n\ncurrent directory: {Helper.projectRoot}\n\n python directory:{python}\n\n{e.ToString()}");
+            Helper.ShowErrorConsole(e.Message);
         }
         catch (Exception e)
         {
-            Helper.ShowError($"{e.ToString()}");
-
-            Console.WriteLine(e);
+            Helper.ShowErrorConsole($"{e.Message}");
         }
         return new List<ModelOutputItem>();
     }
@@ -160,16 +158,16 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     File.Move(item.Path, $"{item.Path}.filtered");
                     File.Copy($"{Helper.projectRoot}\\Dependencies\\black\\black{Path.GetExtension(item.Path)}", item.Path);
-                    Console.WriteLine($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
+                    Helper.ShowErrorConsole($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
                 }
                 catch (IOException)
                 {
-                    Console.WriteLine($"File already filtered: {item.Name}");
+                    Helper.ShowErrorConsole($"File already filtered: {item.Name}");
                 }
                 catch (UnauthorizedAccessException e)
                 {
-                    Helper.ShowError(e.ToString());
-                    Console.WriteLine($"no access. Error: {e}");
+                    Helper.ShowErrorConsole(e.Message);
+                    Helper.ShowErrorConsole($"no access. Error: {e}");
                 }
         }
     }

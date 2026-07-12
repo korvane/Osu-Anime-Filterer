@@ -10,6 +10,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Diagnostics;
 using Avalonia.Threading;
+using osu_filterer.Views;
+
 
 namespace osu_filterer.Dependencies;
 public static class Helper
@@ -17,6 +19,7 @@ public static class Helper
     // Run this if you are building manually. This should point to .\osu-filterer\osu-filterer. if you arent building with avalonia then adjust accordingly.:
     // public static readonly string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
     public static readonly string projectRoot = Path.GetFullPath(AppContext.BaseDirectory);
+    private static IProgress<string>? consoleProgress;
     public static void ShowError(string message)
     {
         Window parent = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow
@@ -35,6 +38,14 @@ public static class Helper
         };
 
         dialog.Show(parent);
+    }
+    public static void SetProgress(IProgress<string> progress)
+    {
+        consoleProgress = progress;
+    }
+    public static void ShowErrorConsole(string message)
+    {
+        consoleProgress?.Report(message);
     }
     public static async Task DownloadPython(bool completed, IProgress<string> progress)
     {

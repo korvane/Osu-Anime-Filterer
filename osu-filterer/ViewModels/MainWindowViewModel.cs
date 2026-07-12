@@ -52,8 +52,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Helper.LogMessage(e.ToString());
-            Helper.LogMessage($"Error: {e}");
+            Helper.LogMessage($"Error:\n{e}");
         }
         if(imagePaths.Count == 0)
         {
@@ -72,7 +71,8 @@ public partial class MainWindowViewModel : ViewModelBase
         path = Path.Join(path, "Songs");
         if (!Path.Exists(path))
         {
-            throw new Exception("Choose a valid path.");
+            Helper.LogMessage("Choose a valid path.");
+            return;
         }
         try
         {
@@ -92,7 +92,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Helper.LogMessage(e.ToString());
+            Helper.LogMessage(e.Message);
             Helper.LogMessage($"error: {e}");
         }
         Helper.LogMessage($"Done with unfilter at {path}");
@@ -136,7 +136,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (System.ComponentModel.Win32Exception e)
         {
-            Helper.LogMessage($"This app cannot run as a standalone!\nProgram must be ran from its original folder.\n\nRemember to change the rootDirectory string if necessary.\n\ncurrent directory: {Helper.projectRoot}\n\n python directory:{python}\n\n{e.ToString()}");
+            Helper.LogMessage($"This app cannot run as a standalone!\nProgram must be ran from its original folder.\n\nRemember to change the rootDirectory string if necessary.\n\ncurrent directory: {Helper.projectRoot}\n\n python directory:{python}\n\n{e.Message}");
             Helper.LogMessage(e.Message);
         }
         catch (Exception e)

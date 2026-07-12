@@ -11,6 +11,7 @@ using System.Linq;
 using System.Diagnostics;
 using Avalonia.Threading;
 using osu_filterer.Views;
+using Avalonia.Controls.Documents;
 
 
 namespace osu_filterer.Dependencies;
@@ -129,7 +130,7 @@ public static class Helper
         if (process.ExitCode != 0)
         {
             LogMessage("\nRequirements install failed\n");
-            throw new Exception("Requirements install failed");
+            return;
         }
             
 
@@ -165,7 +166,7 @@ public static class Helper
         if (process.ExitCode != 0)
         {
             LogMessage("\nDependencies install failed\n");
-            throw new Exception("Requirements install failed");
+            return;
         }
         LogMessage("Finished Python Dependencies install.");
         LogMessage("Setup complete!");

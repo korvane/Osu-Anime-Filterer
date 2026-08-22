@@ -1,4 +1,4 @@
-**OSU ANIME FILTERER** -Application for **recursively** replacing all your Osu! beatmaps that contain anime pictures with a black image.
+**ANIME FILTERER** -Application for **recursively** replacing all your Osu! beatmaps that contain anime pictures with a black image.
 
 
 **1 Corinthians 6:18 reads:**  *Flee from sexual immorality. Every other sin a person commits is outside the body, but the sexually immoral person sins against his own body.*

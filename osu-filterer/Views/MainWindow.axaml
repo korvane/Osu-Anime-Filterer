@@ -19,7 +19,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="2" Height="20" VerticalContentAlignment="Center" PlaceholderText="Osu! root folder (...\Osu!\)"></TextBox>
             <Button x:Name="ChooseFile" HorizontalAlignment="Center" Click="FileExplorer" BorderThickness="3" Margin="5">📂</Button>
-            <Button x:Name="Filter" HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer (recursive)</Button>
+            <Button x:Name="Filter" HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer</Button>
             <Button x:Name="Unfilter" HorizontalAlignment="Center" Click="HandleUnfilter" BorderThickness="3" Margin="5">Undo Filterer</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">

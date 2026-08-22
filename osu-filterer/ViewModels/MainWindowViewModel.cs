@@ -12,6 +12,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 
 using osu_filterer.Views;
 using System.Threading.Tasks;
+using System.Dynamic;
 
 namespace osu_filterer.ViewModels;
 
@@ -24,14 +25,14 @@ public class ModelOutputItem
 }
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public static async Task HandleFilter(string? path)
+    public static List<string> ImagePaths {get; set;} = new List<string>();
+    public static void GatherImages(string? path)
     {
         if (!Path.Exists(path))
         {
             Helper.LogMessage("Choose a valid path.");
             return;
         }
-        List<string> imagePaths = new List<string>();
         try
         {
             foreach (string dir in Directory.EnumerateDirectories(path))
@@ -40,66 +41,56 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     continue;
                 }
-                foreach (string file in Directory.EnumerateFiles(dir))
-                {
-                    if (file.EndsWith(".png") || file.EndsWith(".jpg") || file.EndsWith(".jpeg"))
-                    {
-                        imagePaths.Add(file);
-                    }
-                }
-                File.WriteAllText(Path.Join(dir, ".filtered"), "");
+                GatherImages(dir);
             }
+            foreach (string file in Directory.EnumerateFiles(path))
+            {
+                if (file.EndsWith(".png") || file.EndsWith(".jpg") || file.EndsWith(".jpeg"))
+                {
+                    ImagePaths.Add(file);
+                }
+            }
+            File.WriteAllText(Path.Join(path, ".filtered"), "");
         }
         catch (Exception e)
         {
             Helper.LogMessage($"Error:\n{e}");
         }
-        if(imagePaths.Count == 0)
-        {
-            Helper.LogMessage("beatmaps are filtered!! :P");
-            return;
-        }
-        Helper.LogMessage($"Start Model: {path}\n\n...\n\n");
-        List<ModelOutputItem> unfilteredPaths = await RunModel(imagePaths);
-        Helper.LogMessage($"\nFilter and Replace: {path}\n");
-        FilterFiles(unfilteredPaths);
-        Helper.LogMessage($"\nreplacement done :P");
     }
 
     public static void HandleUnfilter(string path)
     {
         if (!Path.Exists(path))
         {
-            Helper.LogMessage("Choose a valid path.");
+            Helper.LogMessage($"Invalid path: {path}");
             return;
         }
         try
         {
-            Helper.LogMessage($"Start unfilter at {path}\n");
             foreach (string dir in Directory.EnumerateDirectories(path))
             {
-                foreach (string file in Directory.EnumerateFiles(dir))
-                {
-                    if (!file.EndsWith("\\.filtered") && file.EndsWith(".filtered"))
-                    {
-                        File.Delete(file.Substring(0, file.IndexOf(".filtered")));
-                        File.Move(file, file.Substring(0, file.IndexOf(".filtered")));
-                    }
-                }
-                File.Delete(Path.Join(dir, ".filtered"));
+                HandleUnfilter(dir);
             }
+            foreach (string file in Directory.EnumerateFiles(path))
+            {
+                if (!file.EndsWith("\\.filtered") && file.EndsWith(".filtered"))
+                {
+                    File.Delete(file.Substring(0, file.IndexOf(".filtered")));
+                    File.Move(file, file.Substring(0, file.IndexOf(".filtered")));
+                }
+            }
+            File.Delete(Path.Join(path, ".filtered"));
         }
         catch (Exception e)
         {
             Helper.LogMessage(e.Message);
             Helper.LogMessage($"error: {e}");
         }
-        Helper.LogMessage($"Done with unfilter at {path}");
     }
 
-    private static async Task<List<ModelOutputItem>> RunModel(List<string> files)
+    public static async Task<List<ModelOutputItem>> RunModel()
     {
-        var payload = new { images = files };
+        var payload = new { images = ImagePaths };
         string json = JsonSerializer.Serialize(payload);
         string python = $"{Helper.projectRoot}\\dependencies\\python\\python.exe";
 
@@ -145,20 +136,13 @@ public partial class MainWindowViewModel : ViewModelBase
         return new List<ModelOutputItem>();
     }
 
-    // Only checks if a filter has been applied at all, not whether a directory has been scanned.
+    // Checks whether a directory has been scanned.
     private static bool IsFilteredDir(string dir)
     {
-        foreach (string file in Directory.EnumerateFiles(dir))
-        {
-            if (file.EndsWith(".filtered"))
-            {
-                return true;
-            }
-        }
-        return false;
+        return File.Exists(Path.Combine(dir, ".filtered"));
     }
 
-    private static void FilterFiles(List<ModelOutputItem> unfilteredPaths)
+    public static void FilterImages(List<ModelOutputItem> unfilteredPaths)
     {
         foreach (ModelOutputItem item in unfilteredPaths)
         {
@@ -167,7 +151,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 {
                     File.Move(item.Path, $"{item.Path}.filtered");
                     File.Copy($"{Helper.projectRoot}\\Dependencies\\black\\black{Path.GetExtension(item.Path)}", item.Path);
-                    Helper.LogMessage($"probability: {item.Probability:F2} for {System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(item.Path))}: {item.Name}");
+                    Helper.LogMessage($"probability: {item.Probability:F2} for {Path.GetFileName(Path.GetDirectoryName(item.Path))}: {item.Name}");
                 }
                 catch (IOException)
                 {

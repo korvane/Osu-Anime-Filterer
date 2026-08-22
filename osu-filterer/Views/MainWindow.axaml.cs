@@ -14,6 +14,7 @@ using Avalonia.Platform.Storage;
 using osu_filterer.Dependencies;
 using osu_filterer.ViewModels;
 using System.Linq;
+using Avalonia.Controls.Documents;
 namespace osu_filterer.Views;
 
 public partial class MainWindow : Window
@@ -44,7 +45,7 @@ public partial class MainWindow : Window
         Helper.SetProgress(progress);
         Loaded += async(_,_) =>
         {
-                enableButtons(false);
+                EnableButtons(false);
 
                 try
                 {
@@ -52,10 +53,10 @@ public partial class MainWindow : Window
                 }
                 finally
                 {
-                    enableButtons(true);
+                    EnableButtons(true);
                 }
         };
-        
+
     }
 
     public async void FileExplorer(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
@@ -65,7 +66,7 @@ public partial class MainWindow : Window
             TopLevel topLevel = GetTopLevel(this) ?? throw new Exception("Top level is null.");
             FolderPickerOpenOptions options = new FolderPickerOpenOptions { Title = "Hi", AllowMultiple = false };
             IReadOnlyList<IStorageFolder> tempFolder = await topLevel.StorageProvider.OpenFolderPickerAsync(options);
-            
+
             if (tempFolder.Count > 0)
             {
                 osuFile = tempFolder[0].Path.LocalPath;
@@ -81,35 +82,50 @@ public partial class MainWindow : Window
     public async void HandleFilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         Helper.LogMessage("");
-        enableButtons(false);
-         String path = Path.Join(osuFile, "Songs");
-        if (!Path.Exists(path))
+        EnableButtons(false);
+        MainWindowViewModel.ImagePaths = new List<string>(0);
+        if (!Path.Exists(osuFile))
         {
-            Helper.LogMessage("Choose a valid path - your Osu! root folder (...\\Osu!\\)");
+            Helper.LogMessage("Choose a valid path - e.g. your Osu! root folder (...\\Osu!\\)");
         }
         else
         {
-            await Task.Run(() => MainWindowViewModel.HandleFilter(path));
+            MainWindowViewModel.ImagePaths = new List<string>();
+            Helper.LogMessage($"Gathering images at {osuFile}\n");
+            await Task.Run(() => MainWindowViewModel.GatherImages(osuFile));
+            if(MainWindowViewModel.ImagePaths.Count == 0)
+            {
+                Helper.LogMessage("beatmaps are already filtered!! :P");
+            }
+            else
+            {
+                Helper.LogMessage($"Done with gathering images at {osuFile}\n");
+                Helper.LogMessage($"Start Model: {osuFile}\n\n...\n\n");
+                List<ModelOutputItem> unfilteredPaths = await MainWindowViewModel.RunModel();
+                Helper.LogMessage($"\nFilter and Replace: {osuFile}\n");
+                await Task.Run(()=>MainWindowViewModel.FilterImages(unfilteredPaths));
+                Helper.LogMessage($"\nreplacement done :P");
+            }
         }
-        enableButtons(true);
-        
+        EnableButtons(true);
     }
     public async void HandleUnfilter(object? obj, Avalonia.Interactivity.RoutedEventArgs eventArgs)
     {
         Helper.LogMessage("");
-        enableButtons(false);
-        String path = Path.Join(osuFile, "Songs");
-        if (!Path.Exists(path))
+        EnableButtons(false);
+        if (!Path.Exists(osuFile))
         {
-            Helper.LogMessage("Choose a valid path - your Osu! root folder (...\\Osu!\\)");
+            Helper.LogMessage("Choose a valid directory - e.g. your Osu! root folder (...\\Osu!\\)");
         }
         else
         {
-            MainWindowViewModel.HandleUnfilter(path);
+            Helper.LogMessage($"Start unfilter at {osuFile}\n");
+            await Task.Run(()=>MainWindowViewModel.HandleUnfilter(osuFile));
+            Helper.LogMessage($"Done with unfilter at {osuFile}");
         }
-        enableButtons(true);
+        EnableButtons(true);
     }
-    private void enableButtons(bool enable)
+    private void EnableButtons(bool enable)
     {
         if (enable)
         {

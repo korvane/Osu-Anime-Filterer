@@ -1,4 +1,4 @@
-# Python 
+# Python
 osu-filterer/Dependencies/python
 
 # .NET / Avalonia
@@ -15,3 +15,5 @@ Thumbs.db
 .editorconfig
 
 publish.zip
+
+.pre-commit-config.yaml

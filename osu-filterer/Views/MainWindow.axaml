@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="450"
-        Width="700" Height="450"
+        Width="700" Height="455"
         x:Class="osu_filterer.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/osu-anime-replacer.ico"
@@ -19,11 +19,12 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBox x:Name="FilePathTextBox" IsReadOnly="True" BorderThickness="2" Height="20" VerticalContentAlignment="Center" PlaceholderText="Osu! root folder (...\Osu!\)"></TextBox>
             <Button x:Name="ChooseFile" HorizontalAlignment="Center" Click="FileExplorer" BorderThickness="3" Margin="5">📂</Button>
-            <Button x:Name="Filter" HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer</Button>
+            <Button x:Name="Filter" HorizontalAlignment="Center" Click="HandleFilter" BorderThickness="3" Margin="5">Run Filterer (recursive)</Button>
             <Button x:Name="Unfilter" HorizontalAlignment="Center" Click="HandleUnfilter" BorderThickness="3" Margin="5">Undo Filterer</Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
             <TextBox x:Name="ConsoleGUI" TextWrapping="Wrap" AcceptsReturn="True" Focusable="False" IsReadOnly="True" BorderThickness="3" HorizontalAlignment="Stretch" Width="661" Height="350" PlaceholderText="Console output"></TextBox>
         </StackPanel>
+        <TextBlock>⚠️Program will recursively filter/unfilter the chosen directory</TextBlock>
     </StackPanel>
 </Window>

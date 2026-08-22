@@ -17,8 +17,6 @@ using Avalonia.Controls.Documents;
 namespace osu_filterer.Dependencies;
 public static class Helper
 {
-    // Run this if you are building manually. This should point to .\osu-filterer\osu-filterer. if you arent building with avalonia then adjust accordingly.:
-    // public static readonly string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
     public static string projectRoot =
     new DirectoryInfo(AppContext.BaseDirectory).Parent?.Name == "Debug"
         ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."))
@@ -49,7 +47,7 @@ public static class Helper
         string requirements = Path.Combine(dependencies, "requirements.txt");
         string install = Path.Combine(pythonDir, "CompletedInstall.txt");
 
-        
+
         try
         {
             //install embeddable python
@@ -62,8 +60,8 @@ public static class Helper
                 await stream.CopyToAsync(file);
             }
             LogMessage("\nPull complete.\n");
-            
-            //extract 
+
+            //extract
             LogMessage("\nExtracting python env...\n");
             if (Directory.Exists(pythonDir))
                 Directory.Delete(pythonDir, true);
@@ -100,7 +98,7 @@ public static class Helper
         {
             LogMessage(e.Message);
         }
-    
+
         //install pip
         LogMessage("\nInstalling pip...\n");
         var installPip = new ProcessStartInfo
@@ -135,7 +133,7 @@ public static class Helper
             LogMessage("\nRequirements install failed\n");
             return;
         }
-            
+
 
         //install requirements
         LogMessage("\nBeginning Python Dependencies install...\n");

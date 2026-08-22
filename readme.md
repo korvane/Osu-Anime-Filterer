@@ -14,8 +14,8 @@ Download and unzip the exe under 'Releases' to the right.
 Currently you cannot replace individual images; program runs through the whole directory by default.
 
 ## Features
-* Replace all anime images with a black image
-* Restore all replaced images
+* Recursively replace all anime images with a black image
+* Recursively restore all replaced images
 
 ## IMPORTANT
 If you are manually building in an ide, change 'projectRoot' in osu-filterer\Dependencies\Helper.cs line 13.
